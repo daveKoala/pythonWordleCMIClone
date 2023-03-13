@@ -1,8 +1,11 @@
-print("HELLO WORLD......")
+print("This is WYRDL......")
 
-guess = input("Guess the word: ").upper()
+for guess_num in range(1, 7):
 
-if guess == "SNAKE":
-    print("Correct")
-else:
+    guess = input("Guess the word: ").upper()
+
+    if guess == "SNAKE":
+        print("Correct")
+        break
+
     print("Wrong")
