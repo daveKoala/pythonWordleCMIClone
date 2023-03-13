@@ -4,7 +4,11 @@
 FROM python:3.12-rc-bullseye
 
 RUN apt-get update && apt-get upgrade -y \
-  && apt-get install -y curl
+  && apt-get install -y \
+  curl \
+  nodejs \
+  npm \
+  && npm install -g nodemon
 
 WORKDIR /app
 
