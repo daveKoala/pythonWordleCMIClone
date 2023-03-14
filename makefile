@@ -9,3 +9,9 @@ terminal:
 
 run:
 	nodemon --legacy-watch --exec "python3" ./src/wyrdl.py 
+
+list:
+	python ./src/create_wordlist.py ./src/wyrdl.py wordlist.txt
+
+api:
+	python ./src/wordlist_api.py
