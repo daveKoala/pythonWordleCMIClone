@@ -1,11 +1,9 @@
 import pathlib
 import random
-from string import ascii_letters
+import contextlib
+from string import ascii_letters, ascii_uppercase
 from rich.console import Console
 from rich.theme import Theme
-
-# list = pathlib.Path("wordlist.txt").read_text(encoding="utf-8")
-# print(repr(list))
 
 print("This is WYRDL.")
 
@@ -20,24 +18,30 @@ console.print("Look at me!", style="warning")
 
 console = Console(width=40, theme=Theme({"warning": "red on yellow"}))
 
-console = Console(width=40, theme=Theme({"warning": "red on yellow"}))
+NUM_LETTERS = 5
+NUM_GUESSES = 6
+WORDS_PATH = pathlib.Path(__file__).parent / "../wordlist.txt"
 
 
 def main():
     # Pre-process
-    words_path = pathlib.Path(__file__).parent / "../wordlist.txt"
-    word = get_random_word(words_path.read_text(encoding="utf-8").split("\n"))
+    word = get_random_word(WORDS_PATH.read_text(encoding="utf-8").split("\n"))
 
-    guesses = ["_" * 5] * 6
+    guesses = ["_" * NUM_LETTERS] * NUM_GUESSES
 
     # Process (main loop)
-    for idx in range(6):
-        refresh_page(headline=f"Guess {idx + 1} ({word})")
-        show_guesses(guesses, word)
+    with contextlib.suppress(KeyboardInterrupt):
+        for idx in range(NUM_GUESSES):
+            refresh_page(headline=f"Guess {idx + 1} ({word})")
 
-        guesses[idx] = input("\nGuess word: ").upper()
-        if guesses[idx] == word:
-            break
+            show_guesses(guesses, word)
+
+            # guesses[idx] = input("\nGuess word: ").upper()
+
+            guesses[idx] = guess_word(previous_guesses=guesses[:idx])
+
+            if guesses[idx] == word:
+                break
 
     # Post-process
     game_over(guesses, word, guessed_correctly=guesses[idx] == word)
@@ -58,6 +62,8 @@ def get_random_word(word_list):
 
 
 def show_guesses(guesses, word):
+    letter_status = {letter: letter for letter in ascii_uppercase}
+
     for guess in guesses:
         styled_guess = []
         for letter, correct in zip(guess, word):
@@ -71,7 +77,12 @@ def show_guesses(guesses, word):
                 style = "dim"
             styled_guess.append(f"[{style}]{letter}[/]")
 
+            if letter != "_":
+                letter_status[letter] = f"[{style}]{letter}[/]"
+
         console.print("".join(styled_guess), justify="center")
+
+    console.print("\n" + "".join(letter_status.values()), justify="center")
 
 
 def game_over(guesses, word, guessed_correctly):
@@ -82,6 +93,27 @@ def game_over(guesses, word, guessed_correctly):
         console.print(f"\n[bold white on green]Correct, the word is {word}[/]")
     else:
         console.print(f"\n[bold white on red]Sorry, the word was {word}[/]")
+
+
+def guess_word(previous_guesses):
+    guess = console.input("\nGuess word: ").upper()
+
+    if guess in previous_guesses:
+        console.print(f"You've already guessed {guess}.", style="warning")
+        return guess_word(previous_guesses)
+
+    if len(guess) != 5:
+        console.print("Your guess must be 5 letters.", style="warning")
+        return guess_word(previous_guesses)
+
+    if any((invalid := letter) not in ascii_letters for letter in guess):
+        console.print(
+            f"Invalid letter: '{invalid}'. Please use English letters.",
+            style="warning",
+        )
+        return guess_word(previous_guesses)
+
+    return guess
 
 
 if __name__ == "__main__":

@@ -15,3 +15,6 @@ list:
 
 api:
 	python ./src/wordlist_api.py
+
+mind:
+	nodemon --legacy-watch --exec "python3" ./src/masterMind.py
