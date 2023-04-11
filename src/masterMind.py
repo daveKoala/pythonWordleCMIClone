@@ -1,14 +1,17 @@
-# Similar to WYRDLE except it uses colours. There are two modes easy and hard. Easy will give feed back that can be mapped to your guess the hard mode you are given an aggragate
+# The 1970's Mastermind game similar to WYRDLE except it uses colours.
 
 import random
 
-NUM_ROWS = 5
-NUM_CELLS = 6
+NUM_ROWS = 10
+NUM_CELLS = 5
 COLOURS = {
     "green": "G",
     "red": "R",
     "yellow": "Y",
-    "blue": "B"
+    "blue": "B",
+    "orange": "O",
+    "pink": "P",
+    "white": "W"
 }
 
 
@@ -18,7 +21,7 @@ def main():
 
     code = create_code(options=COLOURS)
 
-    print(code)
+    # print(code)
 
     # Process (main loop)
 
@@ -31,7 +34,7 @@ def main():
 
         print(f"guess.........{guess_list}")
 
-        intersect = set(guess_list) & set(code)
+        intersect = set(code) & set(guess_list)
         intersect_count = len(intersect)
 
         positional_count = 0
@@ -51,11 +54,11 @@ def main():
         print("Positional count:", positional_count)
         print("Result list:", result_list)
 
-        if guess == code:
+        if all(x == 1 for x in result_list):
             print("Success")
             break
 
-        print("Wrong")
+        print(f"Wrong: {code}")
 
 
 def create_code(options):
